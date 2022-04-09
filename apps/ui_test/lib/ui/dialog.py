@@ -1,21 +1,20 @@
 import hal_screen, hal_keypad
-from hal_keypad import parse_key_event, KEY_A, KEY_B, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_RELEASE
+from hal_keypad import parse_key_event, KEY_A, KEY_B, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_PRESS
 from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
 from ui.utils import PagedText
 
-def dialog(text="", closeable=True, loading_task=None, text_yes="OK", text_no="OK"):
+def dialog(text="", text_yes="OK", text_no="OK"):
     """ show a dialog and display some text.
         loading_task: () -> (text, closeable, close)
         in the loading_task function, if text == None, will not update text.
         else will reset the page and update the text.
     """
-    ret = None
-    for v in dialog_iter(text, closeable, loading_task, text_yes, text_no):
-        ret = v
-    return ret
+    for v in dialog_iter(text, text_yes, text_no):
+        if v != None:
+            return v
 
-def dialog_iter(text="", closeable=True, task=None, text_yes="OK", text_no="OK"):
+def dialog_iter(text="", text_yes="OK", text_no="OK",):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
@@ -23,26 +22,13 @@ def dialog_iter(text="", closeable=True, task=None, text_yes="OK", text_no="OK")
     AH = SH - FH
     paged_text = PagedText(text, SW, AH, FW, FH)
     redraw = True
-    hal_keypad.clear_key_status([KEY_A, KEY_B, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT])
     while True:
-        if callable(task):
-            last_closeable = closeable
-            ntext, closeable, force_close = task()
-            if ntext != None:
-                redraw = True
-                paged_text = PagedText(ntext, SW, AH, FW, FH)
-            if last_closeable != closeable:
-                redraw = True
-            if force_close:
-                yield None
-                return
         for event in hal_keypad.get_key_event():
             etype, ekey = parse_key_event(event)
-            if etype != EVENT_KEY_RELEASE:
+            if etype != EVENT_KEY_PRESS:
                 continue
-            if closeable and (ekey == KEY_A or ekey == KEY_B):
+            if ekey == KEY_A or ekey == KEY_B:
                 yield ekey == KEY_A
-                return
             if ekey == KEY_LEFT or ekey == KEY_UP:
                 paged_text.page_up()
                 redraw = True
@@ -77,25 +63,17 @@ def dialog_iter(text="", closeable=True, task=None, text_yes="OK", text_no="OK")
             frame.hline(SW-HFW+1, base_y, HFW-1, WHITE)
             frame.vline(SW-1, base_y, FH, WHITE)
             frame.hline(SW-HFW+1, SH-1, HFW-1, WHITE)
-            if closeable:
-                if SINGLE:
-                    tw = len(text_yes) * FW
-                    offset = HFW + (SW - FW - tw) // 2
-                    F8.draw_on_frame(text_yes, frame, offset, base_y, WHITE, SW - FW, FH)
-                else:
-                    tw = len(text_no) * FW
-                    offset = HFW + (ava_x - tw) // 2
-                    F8.draw_on_frame(text_no, frame, offset, base_y, WHITE, ava_x, FH)
-                    tw = len(text_yes) * FW
-                    offset = HFW + (ava_x - tw) // 2
-                    F8.draw_on_frame(text_yes, frame, mid_x+offset, base_y, WHITE, ava_x, FH)
+            if SINGLE:
+                tw = len(text_yes) * FW
+                offset = HFW + (SW - FW - tw) // 2
+                F8.draw_on_frame(text_yes, frame, offset, base_y, WHITE, SW - FW, FH)
             else:
-                if SINGLE:
-                    frame.hline(HFW, base_y + (FH//2), SW - FW, WHITE)
-                else:
-                    frame.hline(HFW, base_y + (FH//2), mid_x - FW - 1, WHITE)
-                    frame.hline(mid_x + HFW + 1, base_y + (FH//2), mid_x - FW - 1, WHITE)
+                tw = len(text_no) * FW
+                offset = HFW + (ava_x - tw) // 2
+                F8.draw_on_frame(text_no, frame, offset, base_y, WHITE, ava_x, FH)
+                tw = len(text_yes) * FW
+                offset = HFW + (ava_x - tw) // 2
+                F8.draw_on_frame(text_yes, frame, mid_x+offset, base_y, WHITE, ava_x, FH)
             redraw = False
             hal_screen.refresh()
-        if (yield None):
-            return
+        yield None

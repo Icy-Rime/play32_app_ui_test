@@ -16,36 +16,25 @@ def main(app_name, *args, **kws):
     hal_keypad.init()
     main_loop()
 
-# count = 0
-# last_now = 0
-# def bg_task():
-#     from utime import ticks_ms, ticks_diff
-#     global count, last_now
-#     now = ticks_ms()
-#     if ticks_diff(now, last_now) >= 1000:
-#         last_now = now
-#         count += 1
-#         return f"{count} secs", count >= 5, count >= 15
-#     return None, count >= 5, count >= 15
-
 def main_loop():
     from ui.dialog import dialog
-    txt = "Hello World"
-    # ret = dialog(txt, task=bg_task, text_yes="确认", text_no="取消")
-    hal_screen.get_framebuffer().fill(0)
-    FONT_8.draw_on_frame("程序结束", hal_screen.get_framebuffer(), 0, 0)
-    hal_screen.refresh()
-    rets = []
-    vals = []
+    import gc
+    txt = "Hello Dragon"
+    ret = dialog(txt, "确认", "确认")
+    dialog("You pressed {}".format("A" if ret else "B"))
+    vals = [0]
     while True:
-        text = "\n".join(rets[-5:])+"\n\nSum:"+str(sum(vals))
-        ret = dialog(text)
+        gc.collect()
+        text = "Sum:"+str(sum(vals))
+        text += "\nmem:" + str(gc.mem_free())
+        text += "\nSum<-5 to exit."
+        ret = dialog(text, "A +1", "B -1")
         if ret == None:
             break
         if ret:
-            rets.append(str(len(rets))+":+1")
-            vals.append(1)
+            vals[0] += 1
         else:
-            rets.append(str(len(rets))+":-1")
-            vals.append(-1)
+            vals[0] -= 1
+        if vals[0] < -5:
+            break
     app.reset_and_run_app("")

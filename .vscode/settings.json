@@ -6,6 +6,7 @@
         "D:\\CODE\\Python\\play32_dev\\lib",
         "../play32-dev",
         "../play32-dev/lib",
+        "./apps/ui_test/lib"
     ],
     "python.analysis.extraPaths": [
         "lib",
@@ -13,5 +14,6 @@
         "D:\\CODE\\Python\\play32_dev\\lib",
         "../play32-dev",
         "../play32-dev/lib",
+        "./apps/ui_test/lib"
     ]
 }

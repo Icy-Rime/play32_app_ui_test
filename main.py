@@ -1,5 +1,5 @@
 import os, sys
-PLAY32DEV_PATH = "/home/dreagonmon/code/micropython/play32-dev" # replace to your path
+PLAY32DEV_PATH = "../play32-dev" # replace to your path
 APP_NAME_ID = "ui_test"
 sys.path.append(PLAY32DEV_PATH)
 import play32env

@@ -4,7 +4,7 @@ from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
 from ui.utils import PagedText
 
-def dialog(text="", closeable=True, loading_task=None, text_yes="Ok", text_no="Close"):
+def dialog(text="", closeable=True, loading_task=None, text_yes="YES", text_no="NO"):
     """ show a dialog and display some text.
         loading_task: () -> (text, closeable, close)
         in the loading_task function, if text == None, will not update text.
@@ -15,7 +15,7 @@ def dialog(text="", closeable=True, loading_task=None, text_yes="Ok", text_no="C
         ret = v
     return ret
 
-def dialog_iter(text="", closeable=True, loading_task=None, text_yes="Ok", text_no="Close"):
+def dialog_iter(text="", closeable=True, loading_task=None, text_yes="YES", text_no="NO"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
@@ -56,28 +56,36 @@ def dialog_iter(text="", closeable=True, loading_task=None, text_yes="Ok", text_
             F8.draw_on_frame(paged_text.get_text(), frame, 0, 0, WHITE, SW, AH)
             # draw button
             base_y = AH
+            mid_x = SW // 2
+            ava_x = mid_x - FW
+            HFW = FW // 2
+            # btn left
+            frame.hline(0, base_y, HFW-1, WHITE)
+            frame.vline(0, base_y, FH, WHITE)
+            frame.hline(0, SH-1, HFW-1, WHITE)
+            # btn middle left
+            frame.hline(mid_x-HFW, base_y, HFW-1, WHITE)
+            frame.vline(mid_x-2, base_y, FH, WHITE)
+            frame.hline(mid_x-HFW, SH-1, HFW-1, WHITE)
+            # btn middle right
+            frame.hline(mid_x+1, base_y, HFW-1, WHITE)
+            frame.vline(mid_x+1, base_y, FH, WHITE)
+            frame.hline(mid_x+1, SH-1, HFW-1, WHITE)
+            # btn right
+            frame.hline(SW-HFW+1, base_y, HFW-1, WHITE)
+            frame.vline(SW-1, base_y, FH, WHITE)
+            frame.hline(SW-HFW+1, SH-1, HFW-1, WHITE)
             if closeable:
-                mid_x = SW // 2
-                ava_x = mid_x - FW
-                HFW = FW // 2
-                text_tmp = "B:"+text_no
-                tw = len(text_tmp) * FW
+                tw = len(text_no) * FW
                 offset = HFW + (ava_x - tw) // 2
-                F8.draw_on_frame(text_tmp, frame, offset, base_y, WHITE, ava_x, FH)
-                text_tmp = "A:"+text_yes
-                tw = len(text_tmp) * FW
+                F8.draw_on_frame(text_no, frame, offset, base_y, WHITE, ava_x, FH)
+                tw = len(text_yes) * FW
                 offset = HFW + (ava_x - tw) // 2
-                F8.draw_on_frame(text_tmp, frame, mid_x+offset, base_y, WHITE, ava_x, FH)
-                frame.hline(mid_x-HFW, base_y, HFW-1, WHITE)
-                frame.vline(mid_x-2, base_y, FH, WHITE)
-                frame.hline(mid_x-HFW, SH-1, HFW-1, WHITE)
-                frame.hline(mid_x+1, base_y, HFW-1, WHITE)
-                frame.vline(mid_x+1, base_y, FH, WHITE)
-                frame.hline(mid_x+1, SH-1, HFW-1, WHITE)
-                redraw = False
+                F8.draw_on_frame(text_yes, frame, mid_x+offset, base_y, WHITE, ava_x, FH)
             else:
-                frame.rect(0, base_y, SW, FH, WHITE)
-                frame.hline(FW, base_y + (FH//2), SW - FW - FW, WHITE)
+                frame.hline(HFW, base_y + (FH//2), mid_x - FW - 1, WHITE)
+                frame.hline(mid_x + HFW + 1, base_y + (FH//2), mid_x - FW - 1, WHITE)
+            redraw = False
             hal_screen.refresh()
         if (yield None):
             return

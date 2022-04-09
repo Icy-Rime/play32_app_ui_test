@@ -12,6 +12,9 @@ class PagedText:
         self.pages = pages
         self.mark = 0
     
+    def __len__(self):
+        return len(self.pages)
+
     def get_text(self):
         return self.pages[self.mark]
     

@@ -31,7 +31,7 @@ def main(app_name, *args, **kws):
 def main_loop():
     from ui.dialog import dialog
     txt = "Hello World"
-    # ret = dialog(txt, loading_task=bg_task, text_yes="确认", text_no="取消")
+    # ret = dialog(txt, task=bg_task, text_yes="确认", text_no="取消")
     hal_screen.get_framebuffer().fill(0)
     FONT_8.draw_on_frame("程序结束", hal_screen.get_framebuffer(), 0, 0)
     hal_screen.refresh()

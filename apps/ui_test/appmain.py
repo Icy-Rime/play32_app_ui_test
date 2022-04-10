@@ -18,7 +18,19 @@ def main(app_name, *args, **kws):
 
 def main_loop():
     from ui.dialog import dialog
+    from ui.progress import progress
     import gc
+    from utime import sleep_ms
+    def timed_task(data=[0]):
+        sleep_ms(16)
+        data[0] += 1
+        if data[0] < 5*1000/32:
+            return None, False
+        elif data[0] >= 15*1000/32:
+            return 1.0, True
+        else:
+            return (data[0]/(1000/32) - 5) / 10, False
+    progress("Working...", None, timed_task, [0])
     txt = "Hello Dragon"
     ret = dialog(txt, "确认", "确认")
     dialog("You pressed {}".format("A" if ret else "B"))

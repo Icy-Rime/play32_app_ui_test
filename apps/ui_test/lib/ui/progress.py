@@ -2,7 +2,7 @@ import hal_screen, hal_keypad
 from hal_keypad import parse_key_event, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_PRESS
 from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
-from ui.utils import PagedText
+from ui.utils import PagedText, draw_paged_text_with_scroll_bar
 from utime import ticks_ms, ticks_diff
 
 def progress(text="", progress=0.0, task=None, *args, **kws):
@@ -28,7 +28,7 @@ def progress_iter(text="", progress=None):
     AH = SH - FH
     BAR_AW = SW - 4
     BAR_AH = FH - 4
-    paged_text = PagedText(text, SW, AH, FW, FH)
+    paged_text = PagedText(text, SW - 4, AH, FW, FH) # reserve for scroll bar
     running_offset = 0.0
     running_t = ticks_ms()
     while True:
@@ -52,7 +52,7 @@ def progress_iter(text="", progress=None):
         frame = hal_screen.get_framebuffer()
         frame.fill(0)
         # draw text
-        F8.draw_on_frame(paged_text.get_text(), frame, 0, 0, WHITE, SW, AH)
+        draw_paged_text_with_scroll_bar(frame, 0, 0, SW, AH, F8, WHITE, paged_text)
         # draw progress bar
         frame.rect(0, AH, SW, FH, WHITE)
         if not inf:

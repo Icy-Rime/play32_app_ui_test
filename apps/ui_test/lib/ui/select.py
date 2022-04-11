@@ -6,7 +6,7 @@ from ui.utils import PagedText, draw_buttons_at_last_line, draw_label_nav, draw_
 from machine import lightsleep
 from play32hw.cpu import cpu_speed_context, VERY_SLOW, FAST
 
-def select_menu(text="", title="", options=[], text_yes="YES", text_no="NO"):
+def select_menu(text="", title="", options=[], text_yes="OK", text_no="CANCEL"):
     """ show a menu and display some text.
         select_menu has a big area to display text, it is suitable for explaining your options.
     """
@@ -16,7 +16,7 @@ def select_menu(text="", title="", options=[], text_yes="YES", text_no="NO"):
                 return v
             lightsleep(33) # save power
 
-def select_menu_gen(text="", title="", options=[], text_yes="YES", text_no="NO"):
+def select_menu_gen(text="", title="", options=[], text_yes="OK", text_no="CANCEL"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
@@ -72,7 +72,7 @@ def select_menu_gen(text="", title="", options=[], text_yes="YES", text_no="NO")
                 hal_screen.refresh()
         yield None
 
-def select_list(title="", options=[], text_yes="YES", text_no="NO"):
+def select_list(title="", options=[], text_yes="OK", text_no="CANCEL"):
     """ show a menu and display some text.
         select_menu has a big area to display text, it is suitable for explaining your options.
     """
@@ -82,7 +82,7 @@ def select_list(title="", options=[], text_yes="YES", text_no="NO"):
                 return v
             lightsleep(33) # save power
 
-def select_list_gen(title="", options=[], text_yes="YES", text_no="NO"):
+def select_list_gen(title="", options=[], text_yes="OK", text_no="CANCEL"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()

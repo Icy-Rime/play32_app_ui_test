@@ -38,15 +38,16 @@ def main_loop():
     from ui.select import select_menu, select_list
     from ui.dialog import dialog
     from ui.progress import progress
+    from ui.select_file import select_file
     import gc
     while True:
-        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List"], text_yes="ENTER", text_no="EXIT")
+        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List", "Files"], text_yes="ENTER", text_no="EXIT")
         if ret < 0:
             break
         elif ret == 0:
             progress("Working...\nPlease wait.", "Progress", None, progress_timed_task, [0])
         elif ret == 1:
-            dg_ret = dialog("Press A or B.", "Dialog", "Press", "Press")
+            dg_ret = dialog("Press A or B.", "Dialog", "A", "B")
             dialog("You pressed {}".format("A" if ret else "B"))
             vals = [0]
             while True:
@@ -69,4 +70,10 @@ def main_loop():
                 k = "B"
                 lst_ret = -(lst_ret + 1)
             dialog("You selected \"{}\", pressed {}".format(lst[lst_ret], k), "List Result")
+        elif ret == 3:
+            pth = select_file(title="Files")
+            if pth == "":
+                dialog("You didn't select any file.", "Files")
+            else:
+                dialog("You selected:\n{}".format(pth), "Files")
     app.reset_and_run_app("")

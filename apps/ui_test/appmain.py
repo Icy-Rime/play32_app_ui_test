@@ -39,9 +39,8 @@ def main_loop():
     from ui.dialog import dialog
     from ui.progress import progress
     import gc
-    select_list("Menu", ["Progress", "Dialog", "========", "tester", "Dragon", "Wyvern", "Kobold"])
     while True:
-        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog"], text_yes="ENTER", text_no="EXIT")
+        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List"], text_yes="ENTER", text_no="EXIT")
         if ret < 0:
             break
         elif ret == 0:
@@ -62,4 +61,12 @@ def main_loop():
                     vals[0] -= 1
                 if vals[0] < -5:
                     break
+        elif ret == 2:
+            lst = ["Dragon is huge and magic!", "not a Dialog", "========", "alpha tester", "Dragon", "Wyvern", "Kobold"]
+            lst_ret = select_list("List", lst)
+            k = "A"
+            if lst_ret < 0:
+                k = "B"
+                lst_ret = -(lst_ret + 1)
+            dialog("You selected \"{}\", pressed {}".format(lst[lst_ret], k), "List Result")
     app.reset_and_run_app("")

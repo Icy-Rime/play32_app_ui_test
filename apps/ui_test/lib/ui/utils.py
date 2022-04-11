@@ -1,11 +1,12 @@
 from graphic.bmfont import get_text_count
 
 class PagedText:
-    def __init__(self, text, area_w, area_h, font_w, font_h, scroll_bar=None):
+    def __init__(self, text, area_w, area_h, font_w, font_h, scroll_bar=None, style_inline=False):
         pages = []
+        scroll_bar_width = font_w if style_inline else 4
         while len(text) > 0:
             if scroll_bar:
-                page_size = get_text_count(text, area_w - 4, area_h, font_w, font_h)
+                page_size = get_text_count(text, area_w - scroll_bar_width, area_h, font_w, font_h)
             else:
                 page_size = get_text_count(text, area_w, area_h, font_w, font_h)
                 if scroll_bar == None and page_size < len(text):
@@ -19,6 +20,7 @@ class PagedText:
         self.pages = pages
         self.mark = 0
         self.with_scroll_bar = True if scroll_bar else False
+        self.style_inline = style_inline
     
     def __len__(self):
         return len(self.pages)
@@ -36,18 +38,35 @@ class PagedText:
 
     def draw(self, frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white):
         FW, FH = font_draw.get_font_size()
-        AW = frame_w - (4 if self.with_scroll_bar else 0) # reserve for scroll bar
-        offset_x = (AW % FW) // 2
-        offset_y = (frame_h % FH) // 2
+        if self.style_inline:
+            HFW = FW // 2
+            AW = frame_w - (FW if self.with_scroll_bar else 0)
+            offset_x = ((AW % FW) // 2) + (FW // 2 if self.with_scroll_bar else 0)
+            offset_y = (frame_h % FH) // 2
+        else:
+            AW = frame_w - (4 if self.with_scroll_bar else 0) # reserve for scroll bar
+            offset_x = (AW % FW) // 2
+            offset_y = (frame_h % FH) // 2
         font_draw.draw_on_frame(self.pages[self.mark], frame, frame_x + offset_x, frame_y + offset_y, color_white, AW, frame_h)
         if self.with_scroll_bar:
-            area_h = frame_h - 4
-            total_pages = len(self.pages)
-            scroll_h = int(area_h / total_pages)
-            scroll_start = int(self.mark * area_h / total_pages)
-            frame.fill_rect(frame_x + frame_w - 3, frame_y + scroll_start + 2, 2, scroll_h, color_white)
-            frame.hline(frame_x + frame_w - 4, frame_y, 4, color_white)
-            frame.hline(frame_x + frame_w - 4, frame_y + frame_h - 1, 4, color_white)
+            if self.style_inline:
+                root_y = frame_h // 2 - 1
+                # left
+                frame.line(frame_x, frame_y + root_y, frame_x + HFW - 1, frame_y, color_white)
+                frame.line(frame_x, frame_y + root_y, frame_x + HFW - 1, frame_y + (root_y * 2), color_white)
+                frame.vline(frame_x + HFW - 1, frame_y + 3, (root_y * 2) - 5, color_white)
+                # right
+                frame.line(frame_x + frame_w - 1, frame_y + root_y, frame_x + frame_w - HFW, frame_y, color_white)
+                frame.line(frame_x + frame_w - 1, frame_y + root_y, frame_x + frame_w - HFW, frame_y + (root_y * 2), color_white)
+                frame.vline(frame_x + frame_w - HFW, frame_y + 3, (root_y * 2) - 5, color_white)
+            else:
+                area_h = frame_h - 4
+                total_pages = len(self.pages)
+                scroll_h = max(int(area_h / total_pages), 1)
+                scroll_start = int(self.mark * area_h / total_pages)
+                frame.fill_rect(frame_x + frame_w - 3, frame_y + scroll_start + 2, 2, scroll_h, color_white)
+                frame.hline(frame_x + frame_w - 4, frame_y, 4, color_white)
+                frame.hline(frame_x + frame_w - 4, frame_y + frame_h - 1, 4, color_white)
 
 def _draw_labeled_text(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label):
     FW, FH = font_draw.get_font_size()

@@ -30,24 +30,24 @@ def progress_timed_task(data=[0]):
 MENU = """Select an UI to see what it looks like.
 
 
-
 呀！隐藏页被发现了！那就给你看看吧~
 龙（Dragons）是《冰与火之歌》中虚构的一种魔法物种，跟许多奇幻小说中龙的虚构形象类似。权力的游戏刚开始人们都相信龙已经灭绝，到该卷结尾的时候，冰与火之歌的世界中再一次出现了龙。
 """
 
 def main_loop():
-    from ui.select import select_menu
+    from ui.select import select_menu, select_list
     from ui.dialog import dialog
     from ui.progress import progress
     import gc
+    select_list("Menu", ["Progress", "Dialog", "========", "tester", "Dragon", "Wyvern", "Kobold"])
     while True:
-        ret = select_menu(MENU, ["Progress", "Dialog", "Exit"], text_yes="ENTER", text_no="EXIT")
-        if ret < 0 or ret == 2:
+        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog"], text_yes="ENTER", text_no="EXIT")
+        if ret < 0:
             break
         elif ret == 0:
-            progress("Working...\nPlease wait.", None, progress_timed_task, [0])
+            progress("Working...\nPlease wait.", "Progress", None, progress_timed_task, [0])
         elif ret == 1:
-            dg_ret = dialog("Press A or B.", "Press", "Press")
+            dg_ret = dialog("Press A or B.", "Dialog", "Press", "Press")
             dialog("You pressed {}".format("A" if ret else "B"))
             vals = [0]
             while True:
@@ -55,7 +55,7 @@ def main_loop():
                 text = "Sum:"+str(sum(vals))
                 text += "\nmem:" + str(gc.mem_free())
                 text += "\nSum<-5 to exit."
-                dg_ret = dialog(text, "A +1", "B -1")
+                dg_ret = dialog(text, "Add Em All", "A +1", "B -1")
                 if dg_ret:
                     vals[0] += 1
                 else:

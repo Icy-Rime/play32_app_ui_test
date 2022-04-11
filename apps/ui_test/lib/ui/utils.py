@@ -45,7 +45,7 @@ class PagedText:
             total_pages = len(self.pages)
             scroll_h = int(area_h / total_pages)
             scroll_start = int(self.mark * area_h / total_pages)
-            frame.fill_rect(frame_w - 3, scroll_start + 2, 2, scroll_h, color_white)
+            frame.fill_rect(frame_x + frame_w - 3, frame_y + scroll_start + 2, 2, scroll_h, color_white)
             frame.hline(frame_x + frame_w - 4, frame_y, 4, color_white)
             frame.hline(frame_x + frame_w - 4, frame_y + frame_h - 1, 4, color_white)
 
@@ -66,13 +66,13 @@ def draw_button(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_whit
     HFW = FW // 2
     # left
     frame.hline(frame_x + 1, frame_y, HFW - 1, color_white)
-    frame.vline(frame_x, frame_y + 1, FH - 2, color_white)
-    frame.vline(frame_x + HFW - 2, frame_y + 2, FH - 4, color_white)
+    frame.vline(frame_x, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + HFW - 2, frame_y + 2, frame_h - 4, color_white)
     frame.hline(frame_x + 1, frame_y + frame_h - 1, HFW - 1, color_white)
     # right
     frame.hline(frame_x + frame_w - HFW, frame_y, HFW - 1, color_white)
-    frame.vline(frame_x + frame_w - 1, frame_y + 1, FH - 2, color_white)
-    frame.vline(frame_x + frame_w - HFW + 1, frame_y + 2, FH - 4, color_white)
+    frame.vline(frame_x + frame_w - 1, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + frame_w - HFW + 1, frame_y + 2, frame_h - 4, color_white)
     frame.hline(frame_x + frame_w - HFW, frame_y + frame_h - 1, HFW - 1, color_white)
 
 def draw_label_nav(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label):
@@ -88,6 +88,44 @@ def draw_label_nav(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_w
     frame.line(frame_x + frame_w - 1, frame_y + root_y, frame_x + frame_w - HFW, frame_y, color_white)
     frame.line(frame_x + frame_w - 1, frame_y + root_y, frame_x + frame_w - HFW, frame_y + (root_y * 2), color_white)
     frame.vline(frame_x + frame_w - HFW, frame_y + 3, (root_y * 2) - 5, color_white)
+
+def draw_label_header(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label):
+    _draw_labeled_text(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label)
+    FW, FH = font_draw.get_font_size()
+    HFW = FW // 2
+    # left
+    frame.vline(frame_x, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + HFW - 2, frame_y, frame_h - 2, color_white)
+    frame.hline(frame_x + 3, frame_y + frame_h - 3, HFW - 3, color_white)
+    frame.hline(frame_x + 1, frame_y + frame_h - 1, HFW - 1, color_white)
+    # right
+    frame.vline(frame_x + frame_w - 1, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + frame_w - HFW + 1, frame_y, frame_h - 2, color_white)
+    frame.hline(frame_x + frame_w - HFW, frame_y + frame_h - 3, HFW - 3, color_white)
+    frame.hline(frame_x + frame_w - HFW, frame_y + frame_h - 1, HFW - 1, color_white)
+
+def draw_label_footer(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label):
+    _draw_labeled_text(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label)
+    FW, FH = font_draw.get_font_size()
+    HFW = FW // 2
+    # left
+    frame.hline(frame_x + 1, frame_y, HFW - 1, color_white)
+    frame.hline(frame_x + 3, frame_y + 2, HFW - 3, color_white)
+    frame.vline(frame_x, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + HFW - 2, frame_y + 2, frame_h - 2, color_white)
+    # right
+    frame.hline(frame_x + frame_w - HFW, frame_y, HFW - 1, color_white)
+    frame.hline(frame_x + frame_w - HFW, frame_y + 2, HFW - 3, color_white)
+    frame.vline(frame_x + frame_w - 1, frame_y + 1, frame_h - 2, color_white)
+    frame.vline(frame_x + frame_w - HFW + 1, frame_y + 2, frame_h - 2, color_white)
+
+def draw_label_invert(frame, frame_x, frame_y, frame_w, frame_h, font_draw, color_white, label):
+    frame.fill_rect(frame_x, frame_y, frame_w, frame_h, color_white)
+    _draw_labeled_text(frame, frame_x, frame_y, frame_w, frame_h, font_draw, 0, label)
+    frame.pixel(frame_x, frame_y, 0)
+    frame.pixel(frame_x + frame_w - 1, frame_y, 0)
+    frame.pixel(frame_x, frame_y + frame_h - 1, 0)
+    frame.pixel(frame_x + frame_w - 1, frame_y + frame_h - 1, 0)
 
 def draw_buttons_at_last_line(frame, frame_w, frame_h, font_draw, color_white, text_yes="YES", text_no="NO"):
     FW, FH = font_draw.get_font_size()

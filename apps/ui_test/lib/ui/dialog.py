@@ -2,28 +2,29 @@ import hal_screen, hal_keypad
 from hal_keypad import parse_key_event, KEY_A, KEY_B, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_PRESS
 from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
-from ui.utils import PagedText, draw_buttons_at_last_line
+from ui.utils import PagedText, draw_buttons_at_last_line, draw_label_header
 from machine import lightsleep
 from play32hw.cpu import cpu_speed_context, VERY_SLOW, FAST
 
-def dialog(text="", text_yes="OK", text_no="OK"):
+def dialog(text="", title="", text_yes="OK", text_no="OK"):
     """ show a dialog and display some text.
         return True/False
     """
     with cpu_speed_context(VERY_SLOW):
-        for v in dialog_iter(text, text_yes, text_no):
+        for v in dialog_iter(text, title, text_yes, text_no):
             if v != None:
                 return v
             lightsleep(33) # save power
 
-def dialog_iter(text="", text_yes="OK", text_no="OK"):
+def dialog_iter(text="", title="", text_yes="OK", text_no="OK"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
     FW, FH = F8.get_font_size()
-    AH = SH - FH
+    TITLE_H = FH if title else 0
+    TEXT_H = SH - FH - TITLE_H
     if isinstance(text, str):
-        paged_text = PagedText(text, SW, AH, FW, FH)
+        paged_text = PagedText(text, SW, TEXT_H, FW, FH)
     else:
         paged_text = None
     redraw = True
@@ -44,11 +45,14 @@ def dialog_iter(text="", text_yes="OK", text_no="OK"):
             with cpu_speed_context(FAST):
                 frame = hal_screen.get_framebuffer()
                 frame.fill(0)
+                # draw title
+                if TITLE_H > 0:
+                    draw_label_header(frame, 0, 0, SW, TITLE_H, F8, WHITE, title)
                 # draw text
                 if callable(text):
-                    text(frame, 0, 0, SW, AH, F8, WHITE)
+                    text(frame, 0, TITLE_H, SW, TEXT_H, F8, WHITE)
                 else:
-                    paged_text.draw(frame, 0, 0, SW, AH, F8, WHITE)
+                    paged_text.draw(frame, 0, TITLE_H, SW, TEXT_H, F8, WHITE)
                 # draw button
                 draw_buttons_at_last_line(frame, SW, SH, F8, WHITE, text_yes, text_no)
                 redraw = False

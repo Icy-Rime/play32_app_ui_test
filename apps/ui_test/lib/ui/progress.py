@@ -2,15 +2,15 @@ import hal_screen, hal_keypad
 from hal_keypad import parse_key_event, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_PRESS
 from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
-from ui.utils import PagedText
+from ui.utils import PagedText, draw_label_header
 from utime import ticks_ms, ticks_diff
 
-def progress(text="", progress=0.0, task=None, *args, **kws):
+def progress(text="", title="", progress=None, task=None, *args, **kws):
     """ show a progress bar with message.
         task: (*args, **kws) => (progress, force_close)
         if task return force_close == True, this function will return.
     """
-    gen = progress_iter(text, progress)
+    gen = progress_iter(text, title, progress)
     next(gen)
     if not callable(task):
         return
@@ -20,16 +20,17 @@ def progress(text="", progress=0.0, task=None, *args, **kws):
         if fc:
             return
 
-def progress_iter(text="", progress=None):
+def progress_iter(text="", title="", progress=None):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
     FW, FH = F8.get_font_size()
-    AH = SH - FH
+    TITLE_H = FH if title else 0
+    TEXT_H = SH - FH - TITLE_H
     BAR_AW = SW - 4
     BAR_AH = FH - 4
     if isinstance(text, str):
-        paged_text = PagedText(text, SW, AH, FW, FH)
+        paged_text = PagedText(text, SW, TEXT_H, FW, FH)
     else:
         paged_text = None
     running_offset = 0.0
@@ -54,18 +55,22 @@ def progress_iter(text="", progress=None):
         # draw
         frame = hal_screen.get_framebuffer()
         frame.fill(0)
+        # draw title
+        if TITLE_H > 0:
+            draw_label_header(frame, 0, 0, SW, TITLE_H, F8, WHITE, title)
         # draw text
         if callable(text):
-            text(frame, 0, 0, SW, AH, F8, WHITE)
+            text(frame, 0, TITLE_H, SW, TEXT_H, F8, WHITE)
         else:
-            paged_text.draw(frame, 0, 0, SW, AH, F8, WHITE)
+            paged_text.draw(frame, 0, TITLE_H, SW, TEXT_H, F8, WHITE)
         # draw progress bar
-        frame.rect(0, AH, SW, FH, WHITE)
+        base_y = TEXT_H + TITLE_H
+        frame.rect(0, base_y, SW, FH, WHITE)
         if not inf:
             bar_w = int(BAR_AW * progress)
             bar_w = min(BAR_AW, bar_w)
             bar_w = max(1, bar_w)
-            frame.fill_rect(2, AH + 2, bar_w, BAR_AH, WHITE)
+            frame.fill_rect(2, base_y + 2, bar_w, BAR_AH, WHITE)
         else:
             now = ticks_ms()
             diff = ticks_diff(now, running_t)
@@ -73,15 +78,14 @@ def progress_iter(text="", progress=None):
             running_offset = running_offset + diff * 32 / 1_000 # 32 pixel/sec
             while running_offset > FW:
                 running_offset -= FW
-            p_top = AH
             p_bottom = SH - 1
             off_x = FW // 2
-            for x in range(-FW, SW, FW//2):
+            for x in range(-FW-FW, SW, FW):
                 x += int(running_offset)
-                frame.line(x, p_bottom, x + off_x, p_top, WHITE)
-            frame.rect(1, AH+1, SW-2, FH-2, 0)
-        frame.pixel(0, AH, 0)
-        frame.pixel(SW - 1, AH, 0)
+                frame.line(x, p_bottom, x + off_x, base_y, WHITE)
+            frame.rect(1, base_y+1, SW-2, FH-2, 0)
+        frame.pixel(0, base_y, 0)
+        frame.pixel(SW - 1, base_y, 0)
         frame.pixel(0, SH - 1, 0)
         frame.pixel(SW - 1, SH - 1, 0)
         hal_screen.refresh()

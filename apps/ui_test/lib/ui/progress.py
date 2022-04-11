@@ -10,7 +10,7 @@ def progress(text="", title="", progress=None, task=None, *args, **kws):
         task: (*args, **kws) => (progress, force_close)
         if task return force_close == True, this function will return.
     """
-    gen = progress_iter(text, title, progress)
+    gen = progress_gen(text, title, progress)
     next(gen)
     if not callable(task):
         return
@@ -20,7 +20,7 @@ def progress(text="", title="", progress=None, task=None, *args, **kws):
         if fc:
             return
 
-def progress_iter(text="", title="", progress=None):
+def progress_gen(text="", title="", progress=None):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()

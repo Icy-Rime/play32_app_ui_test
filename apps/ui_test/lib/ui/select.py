@@ -11,12 +11,12 @@ def select_menu(text="", title="", options=[], text_yes="YES", text_no="NO"):
         select_menu has a big area to display text, it is suitable for explaining your options.
     """
     with cpu_speed_context(VERY_SLOW):
-        for v in select_menu_iter(text, title, options, text_yes, text_no):
+        for v in select_menu_gen(text, title, options, text_yes, text_no):
             if v != None:
                 return v
             lightsleep(33) # save power
 
-def select_menu_iter(text="", title="", options=[], text_yes="YES", text_no="NO"):
+def select_menu_gen(text="", title="", options=[], text_yes="YES", text_no="NO"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()
@@ -77,12 +77,12 @@ def select_list(title="", options=[], text_yes="YES", text_no="NO"):
         select_menu has a big area to display text, it is suitable for explaining your options.
     """
     with cpu_speed_context(VERY_SLOW):
-        for v in select_list_iter(title, options, text_yes, text_no):
+        for v in select_list_gen(title, options, text_yes, text_no):
             if v != None:
                 return v
             lightsleep(33) # save power
 
-def select_list_iter(title="", options=[], text_yes="YES", text_no="NO"):
+def select_list_gen(title="", options=[], text_yes="YES", text_no="NO"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()

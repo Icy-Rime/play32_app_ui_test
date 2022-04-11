@@ -11,12 +11,12 @@ def dialog(text="", title="", text_yes="OK", text_no="OK"):
         return True/False
     """
     with cpu_speed_context(VERY_SLOW):
-        for v in dialog_iter(text, title, text_yes, text_no):
+        for v in dialog_gen(text, title, text_yes, text_no):
             if v != None:
                 return v
             lightsleep(33) # save power
 
-def dialog_iter(text="", title="", text_yes="OK", text_no="OK"):
+def dialog_gen(text="", title="", text_yes="OK", text_no="OK"):
     WHITE = get_white_color(hal_screen.get_format())
     SW, SH = hal_screen.get_size()
     F8 = get_font_8px()

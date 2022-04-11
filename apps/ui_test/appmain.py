@@ -18,7 +18,7 @@ def main(app_name, *args, **kws):
 
 
 def progress_timed_task(data=[0]):
-    utime.sleep_ms(8)
+    utime.sleep_ms(8) # this is inaccuracy, use ticks_diff and ticks_add.
     data[0] += 1
     if data[0] < 5*1000/32:
         return None, False

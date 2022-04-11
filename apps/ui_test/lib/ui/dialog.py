@@ -2,7 +2,7 @@ import hal_screen, hal_keypad
 from hal_keypad import parse_key_event, KEY_A, KEY_B, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, EVENT_KEY_PRESS
 from graphic.framebuf_helper import get_white_color
 from buildin_resource.font import get_font_8px
-from ui.utils import PagedText, draw_buttons_on_last_line, draw_paged_text_with_scroll_bar
+from ui.utils import PagedText, draw_buttons_at_last_line
 from machine import lightsleep
 from play32hw.cpu import cpu_speed_context, VERY_SLOW, FAST
 
@@ -22,7 +22,10 @@ def dialog_iter(text="", text_yes="OK", text_no="OK"):
     F8 = get_font_8px()
     FW, FH = F8.get_font_size()
     AH = SH - FH
-    paged_text = PagedText(text, SW - 4, AH, FW, FH) # reserve for scroll bar
+    if isinstance(text, str):
+        paged_text = PagedText(text, SW, AH, FW, FH)
+    else:
+        paged_text = None
     redraw = True
     while True:
         for event in hal_keypad.get_key_event():
@@ -42,9 +45,12 @@ def dialog_iter(text="", text_yes="OK", text_no="OK"):
                 frame = hal_screen.get_framebuffer()
                 frame.fill(0)
                 # draw text
-                draw_paged_text_with_scroll_bar(frame, 0, 0, SW, AH, F8, WHITE, paged_text)
+                if callable(text):
+                    text(frame, 0, 0, SW, AH, F8, WHITE)
+                else:
+                    paged_text.draw(frame, 0, 0, SW, AH, F8, WHITE)
                 # draw button
-                draw_buttons_on_last_line(frame, SW, SH, F8, WHITE, text_yes, text_no)
+                draw_buttons_at_last_line(frame, SW, SH, F8, WHITE, text_yes, text_no)
                 redraw = False
                 hal_screen.refresh()
         yield None

@@ -40,9 +40,10 @@ def main_loop():
     from ui.progress import progress
     from ui.select_file import select_file
     from ui.input_text import input_text
+    from ui.input import input_slide
     import gc
     while True:
-        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List Select", "Files", "Text Input"], text_yes="ENTER", text_no="EXIT")
+        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List Select", "Files", "Text Input", "Slide Input"], text_yes="ENTER", text_no="EXIT")
         if ret < 0:
             break
         elif ret == 0:
@@ -80,4 +81,7 @@ def main_loop():
         elif ret == 4:
             val = input_text()
             dialog(val)
+        elif ret == 5:
+            val = input_slide()
+            dialog(str(val))
     app.reset_and_run_app("")

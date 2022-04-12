@@ -71,7 +71,7 @@ class InputMethod():
     def clear(self):
         '''清空当前输入'''
         self.__offset_list.clear()
-        self.__input[:] = b''
+        self.__input = bytearray()
         self.__current_block = WordDictBlock.read_block(self.__dict_fp,0)
     def input_byte(self,byt):
         '''输入一个字符的ascii数值，只接受小写字母和退格键0x08，返回是否需要更新候选词'''
@@ -79,7 +79,8 @@ class InputMethod():
             # backspace
             if len(self.__input) == 0:
                 return
-            self.__input.pop()
+            # self.__input.pop()
+            self.__input[-1:] = b""
             if len(self.__offset_list) > len(self.__input):
                 offset = self.__offset_list.pop()
                 self.__current_block = WordDictBlock.read_block(self.__dict_fp,offset)

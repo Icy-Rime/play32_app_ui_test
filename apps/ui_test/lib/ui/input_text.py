@@ -139,7 +139,7 @@ class _KBD_TEXT:
         if len(v) <= 0:
             return
         self.__text = self.__text[:self.__cursor] + v + self.__text[self.__cursor+1:]
-        self.move_cursor(1)
+        self.move_cursor(len(v))
 
     def delete(self):
         delete_index = self.__cursor - 1

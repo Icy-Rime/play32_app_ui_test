@@ -73,6 +73,9 @@ def _draw_labeled_text(frame, frame_x, frame_y, frame_w, frame_h, font_draw, col
     # draw text
     ava_w = frame_w - FW
     text_w = len(label) * FW
+    if text_w > ava_w:
+        label = label[:ava_w // FW]
+        text_w = len(label) * FW
     text_offset_x = (FW // 2) + max((ava_w - text_w) // 2, 0)
     text_offset_y = max((frame_h - FH) // 2, 0)
     font_draw.draw_on_frame(label, frame, frame_x + text_offset_x, frame_y + text_offset_y, color_white, ava_w, FH)

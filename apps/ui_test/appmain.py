@@ -39,9 +39,10 @@ def main_loop():
     from ui.dialog import dialog
     from ui.progress import progress
     from ui.select_file import select_file
+    from ui.input_text import input_text
     import gc
     while True:
-        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List", "Files"], text_yes="ENTER", text_no="EXIT")
+        ret = select_menu(MENU, "Main Menu", ["Progress", "Dialog", "List Select", "Files", "Text Input"], text_yes="ENTER", text_no="EXIT")
         if ret < 0:
             break
         elif ret == 0:
@@ -76,4 +77,7 @@ def main_loop():
                 dialog("You didn't select any file.", "Files")
             else:
                 dialog("You selected:\n{}".format(pth), "Files")
+        elif ret == 4:
+            val = input_text()
+            dialog(val)
     app.reset_and_run_app("")
